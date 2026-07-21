@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOTY Bot — коворкинг работает сам, без администратора на телефоне</title>
+<meta name="description" content="Бронирование, абонементы, оплата по ссылке и пин-код от двери — всё в Telegram. Готовое решение для коворкингов, антикафе и кабинетов на почасовой аренде.">
+<meta property="og:title" content="SOTY Bot — коворкинг работает сам">
+<meta property="og:description" content="Клиент бронирует, оплачивает и открывает дверь сам. 73% броней проходят без администратора.">
+<meta property="og:url" content="https://celsiusov.github.io/soty-landing/">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0E1116; --ink-2:#171C24; --line:#252C36; --wax:#F0EAD8;
+  --dim:#8E98A6; --honey:#F2B01E; --sage:#5E9E88; --r:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--wax);font-family:Inter,system-ui,sans-serif;
+  font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:Unbounded,Inter,sans-serif;font-weight:800;line-height:1.1;letter-spacing:-.02em;margin:0}
+a{color:inherit}
+.mono{font-family:"JetBrains Mono",monospace}
+
+.hexbg{position:absolute;inset:0;z-index:0;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='96' viewBox='0 0 56 96'%3E%3Cpath d='M28 0l28 16v32L28 64 0 48V16z' fill='none' stroke='%23252C36' stroke-width='1.2'/%3E%3Cpath d='M28 64l28 16v32M28 64L0 80v32' fill='none' stroke='%23252C36' stroke-width='1.2'/%3E%3C/svg%3E");
+  -webkit-mask-image:radial-gradient(120% 80% at 70% 10%,#000 0%,transparent 70%);
+  mask-image:radial-gradient(120% 80% at 70% 10%,#000 0%,transparent 70%)}
+
+header{position:relative;z-index:3;padding:22px 0}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-family:Unbounded;font-weight:600;letter-spacing:.02em}
+.logo svg{width:26px;height:26px;flex:none}
+.nav{display:flex;gap:26px;font-size:14px;color:var(--dim)}
+.nav a{text-decoration:none}
+.nav a:hover{color:var(--wax)}
+@media(max-width:860px){.nav{display:none}}
+
+.hero{position:relative;padding:56px 0 72px;overflow:hidden}
+.hero .wrap{position:relative;z-index:2}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--sage);border:1px solid var(--line);border-radius:999px;
+  padding:7px 15px;margin-bottom:26px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--sage);box-shadow:0 0 0 4px rgba(94,158,136,.18)}
+h1{font-size:clamp(34px,5.6vw,62px);max-width:17ch}
+h1 em{font-style:normal;color:var(--honey)}
+.lede{font-size:clamp(17px,2vw,20px);color:#C4CBD4;max-width:58ch;margin:24px 0 0}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;border-radius:999px;
+  font-weight:600;font-size:16px;text-decoration:none;border:none;cursor:pointer;
+  font-family:inherit;transition:.18s transform,.18s background,.18s opacity}
+.btn:hover{transform:translateY(-2px)}
+.btn-p{background:var(--honey);color:#1A1300}
+.btn-s{border:1px solid var(--line);color:var(--wax);background:transparent}
+.btn-s:hover{background:var(--ink-2)}
+.btn[aria-disabled="true"]{opacity:.4;pointer-events:none;transform:none}
+.note{margin-top:16px;font-size:14px;color:var(--dim)}
+
+.comb{position:relative;z-index:2;display:grid;gap:14px;grid-template-columns:repeat(4,1fr)}
+.cell{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);
+  padding:22px 20px;position:relative;overflow:hidden}
+.cell::before{content:"";position:absolute;right:-22px;top:-22px;width:80px;height:80px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 64'%3E%3Cpath d='M28 0l28 16v32L28 64 0 48V16z' fill='none' stroke='%23F2B01E' stroke-width='2'/%3E%3C/svg%3E") no-repeat;opacity:.13}
+.cell b{display:block;font-family:Unbounded;font-size:clamp(26px,3.4vw,34px);font-weight:800;color:var(--honey);line-height:1}
+.cell span{display:block;margin-top:9px;font-size:13.5px;color:var(--dim);line-height:1.4}
+@media(max-width:860px){.comb{grid-template-columns:repeat(2,1fr)}}
+
+section{padding:74px 0;border-top:1px solid var(--line)}
+.tag{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--sage);margin-bottom:18px}
+h2{font-size:clamp(26px,3.6vw,38px);max-width:22ch}
+.sub{color:#B3BCC6;max-width:62ch;margin-top:16px}
+
+.grid{display:grid;gap:16px;grid-template-columns:repeat(3,1fr);margin-top:40px}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:26px 24px}
+.card h3{font-size:18px;font-weight:600;font-family:Unbounded;margin-bottom:10px}
+.card p{margin:0;font-size:15.5px;color:#AEB7C2}
+.ico{width:30px;height:30px;margin-bottom:16px;display:block}
+
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px}
+@media(max-width:760px){.ba{grid-template-columns:1fr}}
+.ba div{border-radius:var(--r);padding:26px 24px;border:1px solid var(--line)}
+.was{background:#15181D}
+.now{background:linear-gradient(180deg,rgba(242,176,30,.09),transparent),var(--ink-2);border-color:rgba(242,176,30,.35)}
+.ba h3{font-size:15px;font-family:"JetBrains Mono",monospace;letter-spacing:.12em;
+  text-transform:uppercase;font-weight:700;margin-bottom:16px}
+.was h3{color:var(--dim)}
+.now h3{color:var(--honey)}
+.ba ul{margin:0;padding-left:18px;color:#AEB7C2;font-size:15.5px}
+.ba li{margin-bottom:9px}
+
+.rail{display:flex;gap:18px;overflow-x:auto;padding:40px 24px 24px;scroll-snap-type:x mandatory}
+.rail::-webkit-scrollbar{height:6px}
+.rail::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+.shot{flex:none;width:230px;scroll-snap-align:center;margin:0}
+.shot img{width:100%;display:block;border-radius:18px;border:1px solid var(--line);background:var(--ink-2)}
+.shot p{font-size:13.5px;color:var(--dim);margin:12px 2px 0;line-height:1.45}
+.shot p b{color:var(--wax);font-weight:600;display:block;font-size:14.5px;margin-bottom:2px}
+
+.pin{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;margin-top:40px}
+@media(max-width:860px){.pin{grid-template-columns:1fr;gap:28px}}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px}
+.key{aspect-ratio:1;display:grid;place-items:center;border:1px solid var(--line);border-radius:12px;
+  background:var(--ink-2);font-family:"JetBrains Mono",monospace;font-size:20px;color:var(--dim)}
+.key.on{color:#1A1300;background:var(--honey);border-color:var(--honey);font-weight:700}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding-left:44px;margin-bottom:20px;color:#B3BCC6;font-size:15.5px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-2px;width:30px;height:30px;
+  display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-size:13px;
+  color:var(--honey);border:1px solid rgba(242,176,30,.4);border-radius:9px}
+.steps b{color:var(--wax)}
+
+.who{display:grid;gap:14px;grid-template-columns:repeat(4,1fr);margin-top:36px}
+@media(max-width:860px){.who{grid-template-columns:repeat(2,1fr)}}
+.who div{border:1px solid var(--line);border-radius:var(--r);padding:20px;background:var(--ink-2)}
+.who b{display:block;font-family:Unbounded;font-size:15.5px;font-weight:600;margin-bottom:7px}
+.who span{font-size:14px;color:var(--dim);line-height:1.45}
+
+.final{text-align:center;padding:86px 0}
+.final h2{margin:0 auto;max-width:24ch}
+.final .sub{margin:18px auto 0}
+.final .cta{justify-content:center}
+.consent{max-width:620px;margin:36px auto 0;text-align:left;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--ink-2);padding:22px 24px}
+.consent label{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;color:#B3BCC6;cursor:pointer}
+.consent input{margin-top:4px;width:19px;height:19px;flex:none;accent-color:var(--honey);cursor:pointer}
+.consent a{color:var(--honey);text-decoration:underline;text-underline-offset:3px}
+.consent .cta{margin-top:20px;justify-content:flex-start}
+.hint{font-size:13px;color:var(--dim);margin:12px 0 0}
+
+.roadmap{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.roadmap span{font-size:14px;color:#B3BCC6;border:1px solid var(--line);border-radius:999px;
+  padding:8px 16px;background:var(--ink-2)}
+.roadmap span::before{content:"→ ";color:var(--sage)}
+
+footer{border-top:1px solid var(--line);padding:36px 0 48px;color:var(--dim);font-size:14px}
+.frow{display:grid;gap:22px;grid-template-columns:1.4fr 1fr 1fr}
+@media(max-width:760px){.frow{grid-template-columns:1fr}}
+footer a{color:var(--wax);text-decoration:none;border-bottom:1px solid var(--line)}
+footer a:hover{border-color:var(--honey)}
+.fh{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--sage);margin-bottom:12px}
+footer p{margin:0 0 8px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--honey);outline-offset:3px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <div class="logo">
+      <svg viewBox="0 0 56 64" aria-hidden="true"><path d="M28 2l26 15v30L28 62 2 47V17z" fill="none" stroke="#F2B01E" stroke-width="4"/></svg>
+      SOTY&nbsp;Bot
+    </div>
+    <nav class="nav">
+      <a href="#what">Возможности</a>
+      <a href="#screens">Как выглядит</a>
+      <a href="#lock">Доступ</a>
+      <a href="#who">Кому подходит</a>
+    </nav>
+    <a class="btn btn-p" style="padding:10px 18px;font-size:14.5px" href="https://t.me/Soty_assistant_bot">Открыть бота</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hexbg" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> Работает в действующем коворкинге каждый день</div>
+    <h1>Коворкинг, который <em>работает без администратора на телефоне.</em></h1>
+    <p class="lede">Клиент бронирует место, оплачивает по ссылке и получает пин-код от двери сам — прямо в Telegram, за минуту. Абонементы, заморозка и отчётность считаются автоматически. Администратор нужен только тогда, когда клиент сам этого хочет.</p>
+    <div class="cta">
+      <a class="btn btn-p" href="https://t.me/Soty_assistant_bot">Посмотреть, как это работает →</a>
+      <a class="btn btn-s" href="#who">Подключить свою площадку</a>
+    </div>
+  </div>
+</div>
+
+<section style="border-top:none;padding-top:0">
+  <div class="wrap">
+    <div class="comb">
+      <div class="cell"><b>73%</b><span>броней клиенты оформляют сами, без участия персонала</span></div>
+      <div class="cell"><b>168</b><span>броней обработано за последние 90 дней</span></div>
+      <div class="cell"><b>51</b><span>пин-код выдан и снят с замка автоматически</span></div>
+      <div class="cell"><b>7&nbsp;079</b><span>проходов через дверь учтено без ручной отметки</span></div>
+    </div>
+    <p class="note">Данные действующей площадки за 90 дней.</p>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="tag">Что меняется</div>
+    <h2>Рутина площадки перестаёт быть работой человека</h2>
+    <p class="sub">Небольшой коворкинг живёт в мессенджере: «есть свободные места?», «продлите абонемент», «пришлите код от двери». Каждый вопрос отвлекает администратора, каждый ответ превращается в строчку в таблице, вписанную руками.</p>
+
+    <div class="ba">
+      <div class="was">
+        <h3>Без бота</h3>
+        <ul>
+          <li>Клиент пишет в чат и ждёт ответа администратора</li>
+          <li>Занятость переговорной держится в голове и в блокноте</li>
+          <li>Код от двери выдают вручную и забывают снять</li>
+          <li>Оплаты, заморозки и визиты сводят в конце месяца</li>
+        </ul>
+      </div>
+      <div class="now">
+        <h3>С SOTY Bot</h3>
+        <ul>
+          <li>Клиент видит свободное время и бронирует за минуту</li>
+          <li>Занятость обновляется в момент бронирования</li>
+          <li>Пин-код приходит в чат и гаснет по окончании срока</li>
+          <li>Оплата по ссылке, а учёт ведётся сам, в реальном времени</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h3"/></svg>
+        <h3>Бронирование</h3>
+        <p>Переговорные, лекторий, гостевые и дневные места. Выбор времени, повторяющиеся брони, перенос и отмена, напоминание перед визитом.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="1.6"><path d="M3 8h18v11H3z"/><path d="M3 12h18M7 16h4"/><path d="M7 8V6h10v2"/></svg>
+        <h3>Оплата по ссылке</h3>
+        <p>Бот присылает ссылку на оплату брони или абонемента. Клиент платит с телефона, доступ и абонемент активируются сразу после оплаты.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="1.6"><path d="M4 7h16v12H4z"/><path d="M4 11h16M9 15h6"/><path d="M8 7V5h8v2"/></svg>
+        <h3>Абонементы</h3>
+        <p>Месячные, пакеты визитов, фиксированные места и офисы. Остаток визитов, продление и напоминание об окончании — на стороне бота.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="1.6"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg>
+        <h3>Заморозка</h3>
+        <p>Клиент уезжает — абонемент ставится на паузу с выбранной даты, срок сдвигается автоматически. Не нужно ничего пересчитывать вручную.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="1.6"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3M12 14v2"/></svg>
+        <h3>Доступ по пин-коду</h3>
+        <p>Бот сам ставит код на смарт-замок на срок брони или абонемента и снимает его по окончании. Ключи и личная встреча у двери не нужны.</p>
+      </div>
+      <div class="card">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#F2B01E" stroke-width="1.6"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+        <h3>Отчётность владельца</h3>
+        <p>Загрузка по местам, часам и дням недели, лог визитов, статусы абонементов и выгрузка данных — без ручного сведения таблиц.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="tag">Важная деталь</div>
+    <h2>Самообслуживание — возможность, а не обязанность</h2>
+    <p class="sub">Часть клиентов не хочет разбираться в меню, торопится или просто привыкла договариваться голосом. Их не нужно переучивать: администратор оформляет бронь или абонемент за них из своего интерфейса, а клиенту приходит только ссылка на оплату и пин-код от двери.</p>
+    <div class="ba">
+      <div class="now">
+        <h3>Клиент сам</h3>
+        <ul>
+          <li>Открывает бота, выбирает место и время</li>
+          <li>Платит по ссылке</li>
+          <li>Получает пин-код и заходит</li>
+        </ul>
+      </div>
+      <div class="now">
+        <h3>Через администратора</h3>
+        <ul>
+          <li>Пишет или звонит: «забронируйте переговорную на четверг»</li>
+          <li>Администратор оформляет бронь и высылает ссылку на оплату</li>
+          <li>Клиент платит и получает тот же пин-код</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Оба пути ведут в одну базу: учёт, отчётность и доступ работают одинаково, кто бы ни оформил бронь.</p>
+  </div>
+</section>
+
+<section id="screens">
+  <div class="wrap">
+    <div class="tag">Как выглядит</div>
+    <h2>Весь коворкинг помещается в переписку</h2>
+    <p class="sub">Клиенту не нужно ставить приложение, регистрироваться на сайте и запоминать пароль.</p>
+  </div>
+  <div class="rail">
+    <figure class="shot"><img src="assets/01-concierge.jpg" alt="Ассистент отвечает на вопросы клиента" loading="lazy"><p><b>Ассистент</b>Отвечает на вопросы о коворкинге обычными словами</p></figure>
+    <figure class="shot"><img src="assets/02-map.jpg" alt="Схема коворкинга" loading="lazy"><p><b>Схема коворкинга</b>Показывает планировку зала и расположение мест</p></figure>
+    <figure class="shot"><img src="assets/03-slot.jpg" alt="Выбор времени бронирования" loading="lazy"><p><b>Любое время</b>Время выбирается календарём или вводится текстом</p></figure>
+    <figure class="shot"><img src="assets/04-free.jpg" alt="Выбор свободного места" loading="lazy"><p><b>Выбор места</b>На этом шаге видно, что свободно на нужную дату</p></figure>
+    <figure class="shot"><img src="assets/05-tap.jpg" alt="Подтверждение брони" loading="lazy"><p><b>Бронь в пару тапов</b>От выбора до подтверждения — меньше минуты</p></figure>
+    <figure class="shot"><img src="assets/06-pin.jpg" alt="Пин-код от двери в чате" loading="lazy"><p><b>Пин-код</b>Приходит в чат и действует ровно на срок брони</p></figure>
+    <figure class="shot"><img src="assets/07-cabinet.jpg" alt="Личный кабинет клиента" loading="lazy"><p><b>Личный кабинет</b>Абонемент, остаток визитов и свои брони</p></figure>
+  </div>
+</section>
+
+<section id="lock">
+  <div class="wrap">
+    <div class="tag">Доступ</div>
+    <h2>Дверь открывается сама тому, кто оплатил</h2>
+    <p class="sub">Самая нервная часть площадки — доступ. Здесь бот заменяет не переписку, а связку ключей и человека, который обязан быть рядом с дверью.</p>
+
+    <div class="pin">
+      <ol class="steps">
+        <li><b>Клиент оплачивает</b> бронь или абонемент по ссылке из бота.</li>
+        <li><b>Код появляется на замке</b> автоматически — ровно на оплаченный срок.</li>
+        <li><b>Код приходит в чат.</b> До начала он не работает, после окончания перестаёт действовать сам.</li>
+        <li><b>Проход учитывается:</b> визит отмечается и списывается с пакета без участия персонала.</li>
+      </ol>
+      <div class="keypad" aria-hidden="true">
+        <div class="key">1</div><div class="key on">2</div><div class="key">3</div>
+        <div class="key">4</div><div class="key">5</div><div class="key on">6</div>
+        <div class="key on">7</div><div class="key">8</div><div class="key">9</div>
+        <div class="key">✱</div><div class="key on">0</div><div class="key">#</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="who">
+  <div class="wrap">
+    <div class="tag">Кому подходит</div>
+    <h2>Любое пространство, которое продаётся часами</h2>
+    <p class="sub">Решение рассчитано на площадки, где помещение сдаётся по времени или по абонементу, а доступ закрыт смарт-замком.</p>
+    <div class="who">
+      <div><b>Коворкинги</b><span>Гибкие и фиксированные места, переговорные, офисы, резиденты</span></div>
+      <div><b>Антикафе и лектории</b><span>Почасовая оплата, мероприятия, повторяющиеся брони</span></div>
+      <div><b>Кабинеты психологов</b><span>Аренда кабинета на приём, сетка сессий, доступ без администратора</span></div>
+      <div><b>Репетиторы и студии</b><span>Занятия по расписанию, пакеты уроков, поздние и ранние часы</span></div>
+    </div>
+
+    <div class="tag" style="margin-top:56px">В планах</div>
+    <div class="roadmap">
+      <span>Версия для платформы MAX</span>
+      <span>Онлайн-оплата внутри диалога</span>
+      <span>Подключение нескольких площадок в одном аккаунте</span>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>Подключить свою площадку</h2>
+    <p class="sub">Покажу решение изнутри на реальных данных, оценю, что нужно именно вашему пространству, и возьму настройку и перенос данных на себя.</p>
+
+    <div class="consent">
+      <label>
+        <input type="checkbox" id="agree">
+        <span>Я ознакомлен с <a href="privacy.html">политикой конфиденциальности</a> и даю <a href="consent.html">согласие на обработку персональных данных</a>.</span>
+      </label>
+      <div class="cta">
+        <a class="btn btn-p" id="go" href="https://t.me/Celsiusov" aria-disabled="true" tabindex="-1">Написать в Telegram</a>
+        <a class="btn btn-s" id="call" href="tel:+79262176355" aria-disabled="true" tabindex="-1">Позвонить</a>
+      </div>
+      <p class="hint" id="hint">Отметьте согласие, чтобы связаться.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap frow">
+    <div>
+      <div class="fh">SOTY Bot</div>
+      <p>Решение для автоматизации коворкингов и почасовой аренды помещений.</p>
+      <p>ИП Жарков Александр Викторович</p>
+    </div>
+    <div>
+      <div class="fh">Контакты</div>
+      <p><a href="tel:+79262176355">+7 926 217-63-55</a></p>
+      <p><a href="https://t.me/Celsiusov">@Celsiusov</a> — основатель</p>
+      <p><a href="https://t.me/Soty_assistant_bot">@Soty_assistant_bot</a> — бот</p>
+      <p><a href="mailto:soty.work@gmail.com">soty.work@gmail.com</a></p>
+    </div>
+    <div>
+      <div class="fh">Документы</div>
+      <p><a href="privacy.html">Политика конфиденциальности</a></p>
+      <p><a href="consent.html">Согласие на обработку персональных данных</a></p>
+      <p style="margin-top:14px">Коворкинг «СОТЫ», Московская обл., г. Реутов, ул. Октября, вл. 10, ТЦ «Экватор», 3 этаж</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var box=document.getElementById('agree'),
+      links=[document.getElementById('go'),document.getElementById('call')],
+      hint=document.getElementById('hint');
+  function sync(){
+    var on=box.checked;
+    links.forEach(function(a){
+      a.setAttribute('aria-disabled',on?'false':'true');
+      if(on){a.removeAttribute('tabindex')}else{a.setAttribute('tabindex','-1')}
+    });
+    hint.textContent=on?'Спасибо. Напишите или позвоните — отвечу лично.':'Отметьте согласие, чтобы связаться.';
+  }
+  box.addEventListener('change',sync); sync();
+})();
+</script>
+</body>
+</html>
